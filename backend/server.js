@@ -12,8 +12,27 @@ connectDB();
 
 const app = express();
 
-// Middleware: enable CORS for all origins (frontend requests)
-app.use(cors());
+// Middleware: CORS (allow all by default, or specific origins via CORS_ORIGIN)
+const corsOriginEnv = process.env.CORS_ORIGIN;
+const allowedOrigins = corsOriginEnv
+  ? corsOriginEnv.split(',').map((origin) => origin.trim())
+  : [];
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes('*')) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(null, false);
+    },
+  })
+);
 
 // Middleware: parse JSON request bodies
 app.use(express.json());
