@@ -1,210 +1,199 @@
 # backend-auth-task-manager
 
-Scalable REST API with JWT authentication, role-based access, and task CRUD, with a minimal React frontend.
+Scalable REST API with authentication and role-based access, plus a simple React frontend for testing APIs.
+
+## About the Assignment
+
+This project is built for the Backend Developer Intern assignment.
+
+Goal:
+1. Build a secure and scalable backend API with authentication and RBAC.
+2. Build a basic frontend UI to demonstrate API usage.
+
+## Assignment Coverage
+
+### Backend (Primary Focus)
+
+1. User registration and login with bcrypt password hashing and JWT authentication.
+2. Role-based access (user vs admin).
+3. CRUD APIs for a secondary entity (tasks).
+4. API versioning with `/api/v1`, centralized error responses, and request validation.
+5. API documentation via Swagger (`/api/v1/docs`).
+6. Database schema and data model using MongoDB + Mongoose.
+
+### Basic Frontend (Supportive)
+
+1. Built with React.
+2. UI supports:
+   - Register and login.
+   - Protected dashboard access with JWT.
+   - Task CRUD operations.
+   - Success and error messages.
+3. Admin users can manage roles directly from dashboard UI.
+
+### Security and Scalability
+
+1. JWT authentication with protected routes.
+2. Password hashing using bcryptjs.
+3. Input validation using express-validator.
+4. Rate limiting on auth and task routes.
+5. Modular structure for easy feature expansion.
 
 ## Tech Stack
 
-- **Backend**: Node.js, Express, MongoDB (Mongoose), JWT, bcryptjs
-- **Frontend**: React
-
-## Live Demo
-
-- **Frontend (Vercel)**: `https://your-frontend-domain.vercel.app`
-- **Backend API (Render/Railway)**: `https://your-backend-domain.com/api/v1`
-
----
+1. Backend: Node.js, Express, MongoDB, Mongoose, JWT, bcryptjs, express-validator.
+2. Frontend: React.
 
 ## Project Structure
 
-```
+```text
 backend-auth-task-manager/
-├── backend/
-│   ├── config/        # Database connection
-│   ├── controllers/   # Route handlers
-│   ├── middleware/    # JWT auth & role-based access
-│   ├── models/        # Mongoose models (User, Task)
-│   ├── routes/        # Express routers
-│   ├── .env.example   # Example environment file
-│   ├── package.json
-│   └── server.js      # Entry point
-└── frontend/
-    ├── public/
-    └── src/
-        ├── components/ # Login, Dashboard
-        ├── App.js
-        └── index.js
+|-- backend/
+|   |-- config/
+|   |-- controllers/
+|   |-- middleware/
+|   |-- models/
+|   |-- routes/
+|   |-- scripts/
+|   |-- .env.example
+|   |-- package.json
+|   `-- server.js
+`-- frontend/
+    |-- public/
+    |-- src/
+    |-- .env.example
+    `-- package.json
 ```
 
----
+## Local Setup
 
-## Backend Setup
-
-### 1. Install dependencies
+### 1. Backend setup
 
 ```bash
 cd backend
 npm install
-```
-
-### 2. Configure environment variables
-
-```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your values:
+Set values in backend `.env`:
 
-```
+```dotenv
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/task-manager
 JWT_SECRET=your_super_secret_jwt_key_change_this
 JWT_EXPIRES_IN=7d
-ADMIN_INVITE_CODE=
+ADMIN_INVITE_CODE=fromProgrammer
 CORS_ORIGIN=http://localhost:3000
 ```
 
-### 3. Run the server
+Run backend:
 
 ```bash
-# Development (with auto-reload)
 npm run dev
+```
 
-# Production
+### 2. Frontend setup
+
+```bash
+cd ../frontend
+npm install
+cp .env.example .env
+```
+
+Set value in frontend `.env`:
+
+```dotenv
+REACT_APP_API_URL=http://localhost:5000/api/v1
+```
+
+Run frontend:
+
+```bash
 npm start
 ```
 
-The backend runs on `http://localhost:5000`.
+## Role-Based Access: Easy Admin Setup
 
-### 4. Promote first admin user
+### Option 1 (Simple UI flow with code)
 
-Register a normal user first, then run:
+1. Keep `ADMIN_INVITE_CODE=fromProgrammer` in backend env.
+2. Open register screen in frontend.
+3. Click `Have Admin Code?`.
+4. Enter `fromProgrammer` and register.
+5. That user is created as `admin`.
+
+### Option 2 (One-time script)
+
+Register normal user first, then run:
 
 ```bash
 cd backend
 npm run make-admin -- your-email@example.com
 ```
 
-This promotes the user with that email to role `admin`.
+## API Reference
 
-You can also set `ADMIN_INVITE_CODE` and enter that code during registration.
-If the code matches, the new user is registered as `admin`.
+Base URL: `/api/v1`
 
----
+### Auth APIs
 
-## Backend API Reference
+1. `POST /auth/register` (Public)
+2. `POST /auth/login` (Public)
+3. `GET /auth/me` (Private)
+4. `GET /auth/admin/users` (Admin)
+5. `PATCH /auth/admin/users/:id/role` (Admin)
 
-All routes are prefixed with `/api/v1/`.
+### Task APIs
 
-### Auth
+1. `GET /tasks` (Private)
+2. `POST /tasks` (Private)
+3. `GET /tasks/:id` (Private)
+4. `PUT /tasks/:id` (Private)
+5. `DELETE /tasks/:id` (Private)
 
-| Method | Endpoint              | Access  | Description         |
-|--------|-----------------------|---------|---------------------|
-| POST   | `/auth/register`      | Public  | Register a new user |
-| POST   | `/auth/login`         | Public  | Login & get token   |
-| GET    | `/auth/me`            | Private | Get current user    |
-| GET    | `/auth/admin/users`   | Admin   | Get all users       |
-| PATCH  | `/auth/admin/users/:id/role` | Admin | Update user role |
+Swagger Docs:
 
-### Tasks
+`/api/v1/docs`
 
-| Method | Endpoint        | Access  | Description             |
-|--------|-----------------|---------|-------------------------|
-| GET    | `/tasks`        | Private | Get all tasks (own)     |
-| POST   | `/tasks`        | Private | Create a new task       |
-| GET    | `/tasks/:id`    | Private | Get a single task       |
-| PUT    | `/tasks/:id`    | Private | Update a task           |
-| DELETE | `/tasks/:id`    | Private | Delete a task           |
+## Deployment Steps
 
-> **Admin users** can view and manage all tasks, and can manage user roles. **Regular users** can only access their own tasks.
+### Backend on Render
 
----
+1. Create Web Service from GitHub repo.
+2. Set Root Directory: `backend`.
+3. Build Command: `npm install`.
+4. Start Command: `npm start`.
+5. Set env variables on Render:
+   - `MONGO_URI=<atlas-uri>`
+   - `JWT_SECRET=<strong-secret>`
+   - `JWT_EXPIRES_IN=7d`
+   - `ADMIN_INVITE_CODE=fromProgrammer`
+   - `CORS_ORIGIN=<your-vercel-frontend-domain>`
 
-## Frontend Setup
+### Frontend on Vercel
 
-### 1. Install dependencies
+1. Import same repo in Vercel.
+2. Root Directory: `frontend`.
+3. Build Command: `npm run build`.
+4. Output Directory: `build`.
+5. Env variable:
+   - `REACT_APP_API_URL=https://your-render-domain.onrender.com/api/v1`
 
-```bash
-cd frontend
-npm install
-```
+## Deliverables Checklist
 
-### 2. Configure API URL
+1. Backend hosted on GitHub with setup README.
+2. Working authentication and task CRUD APIs.
+3. Basic frontend integrated with backend APIs.
+4. API documentation through Swagger.
 
-Create a `.env` file in `frontend/`:
+## Short Scalability Note
 
-```
-REACT_APP_API_URL=http://localhost:5000/api/v1
-```
+Current structure is modular and can scale by splitting domains into services:
 
-### 3. Run the app
-
-```bash
-npm start
-```
-
-The frontend runs on `http://localhost:3000`.
-
----
-
-## Deployment (Optional)
-
-### Deploy Backend on Render
-
-1. Push this repository to GitHub.
-2. In Render, create a **Web Service** and connect your repo.
-3. Set:
-   - **Root Directory**: `backend`
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-4. Add environment variables in Render:
-   - `PORT` = `10000` (or leave default if Render injects it)
-   - `MONGO_URI` = your MongoDB Atlas connection string
-   - `JWT_SECRET` = a long random secret
-   - `JWT_EXPIRES_IN` = `7d`
-   - `CORS_ORIGIN` = your deployed frontend URL (for example `https://your-frontend-domain.vercel.app`)
-5. Deploy and note your backend URL.
-
-### Deploy Backend on Railway
-
-1. Create a new project from your GitHub repo.
-2. Set service root to `backend`.
-3. Railway will run `npm install`/`npm start` from `backend`.
-4. Add environment variables:
-   - `MONGO_URI`
-   - `JWT_SECRET`
-   - `JWT_EXPIRES_IN`
-   - `CORS_ORIGIN` (set to frontend domain)
-5. Deploy and copy the generated backend URL.
-
-### Deploy Frontend on Vercel
-
-1. Import the repo in Vercel.
-2. Set **Root Directory** to `frontend`.
-3. Add environment variable:
-   - `REACT_APP_API_URL` = `https://your-backend-domain.com/api/v1`
-4. Deploy and copy the frontend URL.
-5. Update backend `CORS_ORIGIN` to this frontend URL if needed.
-
-### Production Notes
-
-- Do **not** commit `.env` files. This project only tracks `.env.example` templates.
-- Keep secrets (`JWT_SECRET`, `MONGO_URI`) in hosting platform environment settings.
-- Authentication, JWT, RBAC, and rate limiting remain unchanged and active in production.
-
----
-
-## Features
-
-- User registration and login with password hashing (bcrypt)
-- JWT-based authentication stored in `localStorage`
-- Role-based access control (user vs admin) with admin-only routes
-- Optional admin invite code at registration (`ADMIN_INVITE_CODE`)
-- Protected dashboard that fetches and displays user tasks
-- Create and delete tasks via the UI
-- Success/error feedback messages
-- CORS enabled for frontend–backend communication
-
----
+1. Move auth, users, and tasks into separate services when traffic grows.
+2. Add Redis caching for hot read endpoints.
+3. Use load balancing and horizontal scaling for API servers.
+4. Add centralized logging and monitoring for production observability.
 
 ## License
 
