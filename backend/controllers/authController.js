@@ -14,7 +14,7 @@ const register = async (req, res) => {
     return res.status(400).json({ success: false, errors: errors.array() });
   }
 
-  const { name, email, password } = req.body;
+  const { name, email, password, adminCode } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -24,7 +24,19 @@ const register = async (req, res) => {
         .json({ success: false, message: 'Email already registered' });
     }
 
-    const user = await User.create({ name, email, password, role: 'user' });
+    const inviteCode = process.env.ADMIN_INVITE_CODE;
+    const shouldBeAdmin =
+      inviteCode &&
+      typeof adminCode === 'string' &&
+      adminCode.trim().length > 0 &&
+      adminCode.trim() === inviteCode;
+
+    const user = await User.create({
+      name,
+      email,
+      password,
+      role: shouldBeAdmin ? 'admin' : 'user',
+    });
 
     const token = generateToken(user._id);
 

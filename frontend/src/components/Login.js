@@ -4,9 +4,15 @@ const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/v1'
 
 function Login({ onLogin }) {
   const [isRegister, setIsRegister] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    adminCode: '',
+  });
   const [message, setMessage] = useState({ type: '', text: '' });
   const [loading, setLoading] = useState(false);
+  const [showAdminCode, setShowAdminCode] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,7 +28,12 @@ function Login({ onLogin }) {
       : `${API_BASE}/auth/login`;
 
     const body = isRegister
-      ? { name: formData.name, email: formData.email, password: formData.password }
+      ? {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          adminCode: showAdminCode ? formData.adminCode : '',
+        }
       : { email: formData.email, password: formData.password };
 
     try {
@@ -99,6 +110,32 @@ function Login({ onLogin }) {
             />
           </div>
 
+          {isRegister && (
+            <div style={{ marginBottom: 12 }}>
+              <button
+                type="button"
+                className="btn-secondary"
+                style={{ width: '100%' }}
+                onClick={() => setShowAdminCode((prev) => !prev)}
+              >
+                {showAdminCode ? 'Hide Admin Code' : 'Have Admin Code?'}
+              </button>
+            </div>
+          )}
+
+          {isRegister && showAdminCode && (
+            <div>
+              <label>Admin Code (Optional)</label>
+              <input
+                type="text"
+                name="adminCode"
+                placeholder="Enter admin invite code"
+                value={formData.adminCode}
+                onChange={handleChange}
+              />
+            </div>
+          )}
+
           <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? 'Please wait...' : isRegister ? 'Register' : 'Login'}
           </button>
@@ -107,7 +144,11 @@ function Login({ onLogin }) {
         <p style={{ textAlign: 'center', marginTop: 16, fontSize: 13 }}>
           {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
           <button
-            onClick={() => { setIsRegister(!isRegister); setMessage({ type: '', text: '' }); }}
+            onClick={() => {
+              setIsRegister(!isRegister);
+              setShowAdminCode(false);
+              setMessage({ type: '', text: '' });
+            }}
             style={{ background: 'none', color: '#1f8f4e', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
           >
             {isRegister ? 'Login' : 'Register'}

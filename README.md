@@ -59,6 +59,7 @@ PORT=5000
 MONGO_URI=mongodb://localhost:27017/task-manager
 JWT_SECRET=your_super_secret_jwt_key_change_this
 JWT_EXPIRES_IN=7d
+ADMIN_INVITE_CODE=
 CORS_ORIGIN=http://localhost:3000
 ```
 
@@ -84,6 +85,9 @@ npm run make-admin -- your-email@example.com
 ```
 
 This promotes the user with that email to role `admin`.
+
+You can also set `ADMIN_INVITE_CODE` and enter that code during registration.
+If the code matches, the new user is registered as `admin`.
 
 ---
 
@@ -194,6 +198,7 @@ The frontend runs on `http://localhost:3000`.
 - User registration and login with password hashing (bcrypt)
 - JWT-based authentication stored in `localStorage`
 - Role-based access control (user vs admin) with admin-only routes
+- Optional admin invite code at registration (`ADMIN_INVITE_CODE`)
 - Protected dashboard that fetches and displays user tasks
 - Create and delete tasks via the UI
 - Success/error feedback messages
