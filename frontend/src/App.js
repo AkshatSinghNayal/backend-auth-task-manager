@@ -3,13 +3,11 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 
 function App() {
-  // Check localStorage for an existing JWT token on startup
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem('user') || 'null')
   );
 
-  // Keep localStorage in sync when token/user changes
   useEffect(() => {
     if (token) {
       localStorage.setItem('token', token);
@@ -30,7 +28,6 @@ function App() {
     setUser(null);
   };
 
-  // Show Dashboard if logged in, otherwise show Login
   return token ? (
     <Dashboard token={token} user={user} onLogout={handleLogout} />
   ) : (

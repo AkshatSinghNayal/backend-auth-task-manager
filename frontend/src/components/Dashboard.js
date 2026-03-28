@@ -8,7 +8,6 @@ function Dashboard({ token, user, onLogout }) {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [loading, setLoading] = useState(false);
 
-  // Fetch tasks from the backend
   const fetchTasks = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE}/tasks`, {
@@ -34,7 +33,6 @@ function Dashboard({ token, user, onLogout }) {
     setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   };
 
-  // Create a new task
   const handleCreateTask = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -63,7 +61,6 @@ function Dashboard({ token, user, onLogout }) {
     }
   };
 
-  // Delete a task
   const handleDeleteTask = async (id) => {
     if (!window.confirm('Delete this task?')) return;
     try {
@@ -83,6 +80,44 @@ function Dashboard({ token, user, onLogout }) {
     }
   };
 
+  const handleUpdateTask = async (task) => {
+    const title = window.prompt('Update title', task.title);
+    if (title === null) return;
+
+    const description = window.prompt(
+      'Update description',
+      task.description || ''
+    );
+    if (description === null) return;
+
+    const status = window.prompt(
+      'Update status: pending, in-progress, completed',
+      task.status
+    );
+    if (status === null) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/tasks/${task._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title, description, status }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        showMessage('success', data.message || 'Task updated successfully');
+        fetchTasks();
+      } else {
+        showMessage('error', data.message || 'Failed to update task');
+      }
+    } catch {
+      showMessage('error', 'Network error. Could not update task.');
+    }
+  };
+
   const statusClass = (status) => {
     if (status === 'completed') return 'status-completed';
     if (status === 'in-progress') return 'status-in-progress';
@@ -91,25 +126,22 @@ function Dashboard({ token, user, onLogout }) {
 
   return (
     <div className="container">
-      {/* Header */}
       <div className="header">
         <h1>
           Welcome, {user?.name}{' '}
-          <span style={{ fontSize: 13, color: '#7f8c8d' }}>({user?.role})</span>
+          <span style={{ fontSize: 13, color: '#4c7e60' }}>({user?.role})</span>
         </h1>
-        <button className="btn-secondary" onClick={onLogout}>
+        <button className="btn-logout" onClick={onLogout}>
           Logout
         </button>
       </div>
 
-      {/* Feedback messages */}
       {message.text && (
         <div className={message.type === 'error' ? 'msg-error' : 'msg-success'}>
           {message.text}
         </div>
       )}
 
-      {/* Add Task Form */}
       <div className="add-task-form">
         <h3>Add New Task</h3>
         <form onSubmit={handleCreateTask}>
@@ -143,7 +175,6 @@ function Dashboard({ token, user, onLogout }) {
         </form>
       </div>
 
-      {/* Task List */}
       <h3>Your Tasks ({tasks.length})</h3>
       {tasks.length === 0 ? (
         <p style={{ color: '#999', marginTop: 12 }}>No tasks yet. Add one above!</p>
@@ -158,6 +189,13 @@ function Dashboard({ token, user, onLogout }) {
                   {task.status}
                 </span>
               </div>
+              <button
+                className="btn-secondary"
+                onClick={() => handleUpdateTask(task)}
+                style={{ marginRight: 8 }}
+              >
+                Edit
+              </button>
               <button
                 className="btn-danger"
                 onClick={() => handleDeleteTask(task._id)}

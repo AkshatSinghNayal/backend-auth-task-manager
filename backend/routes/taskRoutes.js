@@ -12,7 +12,6 @@ const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Rate limiter for task endpoints: max 100 requests per 15 minutes
 const taskLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -21,11 +20,9 @@ const taskLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// All task routes are rate-limited and require authentication
 router.use(taskLimiter);
 router.use(protect);
 
-// Validation rules for task creation
 const taskValidation = [
   body('title').notEmpty().withMessage('Task title is required'),
 ];

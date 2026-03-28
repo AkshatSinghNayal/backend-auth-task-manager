@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Middleware: verify JWT token and attach user to request
 const protect = async (req, res, next) => {
   let token;
 
@@ -20,7 +19,6 @@ const protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // Attach user info (without password) to the request object
     req.user = await User.findById(decoded.id).select('-password');
     if (!req.user) {
       return res
@@ -35,7 +33,6 @@ const protect = async (req, res, next) => {
   }
 };
 
-// Middleware: restrict access to specific roles (e.g., 'admin')
 const authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {

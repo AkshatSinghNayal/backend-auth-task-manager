@@ -1,18 +1,17 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
 const connectDB = require('./config/db');
+const swaggerDocument = require('./config/swagger');
 
-// Route imports
 const authRoutes = require('./routes/authRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 
-// Connect to MongoDB
 connectDB();
 
 const app = express();
 
-// Middleware: CORS (allow all by default, or specific origins via CORS_ORIGIN)
 const corsOriginEnv = process.env.CORS_ORIGIN;
 const allowedOrigins = corsOriginEnv
   ? corsOriginEnv.split(',').map((origin) => origin.trim())
@@ -34,24 +33,20 @@ app.use(
   })
 );
 
-// Middleware: parse JSON request bodies
 app.use(express.json());
 
-// API versioning: all routes prefixed with /api/v1
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tasks', taskRoutes);
+app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Health check route
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({ success: true, message: 'Server is running' });
 });
 
-// Handle unmatched routes
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
 });
 
-// Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ success: false, message: 'Internal server error' });

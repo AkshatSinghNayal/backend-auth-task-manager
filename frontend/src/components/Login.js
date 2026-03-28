@@ -35,13 +35,11 @@ function Login({ onLogin }) {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        // Show first validation error or server message
         const errMsg =
           data.errors?.[0]?.msg || data.message || 'Something went wrong';
         setMessage({ type: 'error', text: errMsg });
       } else {
         setMessage({ type: 'success', text: data.message });
-        // Pass token and user info up to App
         onLogin(data.token, data.user);
       }
     } catch {
@@ -110,7 +108,7 @@ function Login({ onLogin }) {
           {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
           <button
             onClick={() => { setIsRegister(!isRegister); setMessage({ type: '', text: '' }); }}
-            style={{ background: 'none', color: '#4a90e2', border: 'none', cursor: 'pointer', fontSize: 13 }}
+            style={{ background: 'none', color: '#1f8f4e', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
           >
             {isRegister ? 'Login' : 'Register'}
           </button>

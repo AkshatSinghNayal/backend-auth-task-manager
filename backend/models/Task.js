@@ -17,7 +17,6 @@ const taskSchema = new mongoose.Schema(
       enum: ['pending', 'in-progress', 'completed'],
       default: 'pending',
     },
-    // Each task is linked to a specific user
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
