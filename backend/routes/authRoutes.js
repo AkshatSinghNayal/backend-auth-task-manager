@@ -1,12 +1,17 @@
 const express = require('express');
 const { body } = require('express-validator');
 const rateLimit = require('express-rate-limit');
-const { register, login, getMe } = require('../controllers/authController');
-const { protect } = require('../middleware/auth');
+const {
+  register,
+  login,
+  getMe,
+  getUsers,
+  updateUserRole,
+} = require('../controllers/authController');
+const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Rate limiter for auth endpoints: max 20 requests per 15 minutes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
@@ -15,7 +20,6 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Validation rules for registration
 const registerValidation = [
   body('name').notEmpty().withMessage('Name is required'),
   body('email').isEmail().withMessage('Please provide a valid email'),
@@ -24,7 +28,6 @@ const registerValidation = [
     .withMessage('Password must be at least 6 characters'),
 ];
 
-// Validation rules for login
 const loginValidation = [
   body('email').isEmail().withMessage('Please provide a valid email'),
   body('password').notEmpty().withMessage('Password is required'),
@@ -33,5 +36,16 @@ const loginValidation = [
 router.post('/register', authLimiter, registerValidation, register);
 router.post('/login', authLimiter, loginValidation, login);
 router.get('/me', authLimiter, protect, getMe);
+router.get('/admin/users', authLimiter, protect, authorize('admin'), getUsers);
+router.patch(
+  '/admin/users/:id/role',
+  authLimiter,
+  protect,
+  authorize('admin'),
+  body('role')
+    .isIn(['user', 'admin'])
+    .withMessage('Role must be either user or admin'),
+  updateUserRole
+);
 
 module.exports = router;

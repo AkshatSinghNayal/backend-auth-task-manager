@@ -87,6 +87,8 @@ All routes are prefixed with `/api/v1/`.
 | POST   | `/auth/register`      | Public  | Register a new user |
 | POST   | `/auth/login`         | Public  | Login & get token   |
 | GET    | `/auth/me`            | Private | Get current user    |
+| GET    | `/auth/admin/users`   | Admin   | Get all users       |
+| PATCH  | `/auth/admin/users/:id/role` | Admin | Update user role |
 
 ### Tasks
 
@@ -98,7 +100,7 @@ All routes are prefixed with `/api/v1/`.
 | PUT    | `/tasks/:id`    | Private | Update a task           |
 | DELETE | `/tasks/:id`    | Private | Delete a task           |
 
-> **Admin users** can view and manage all tasks. **Regular users** can only access their own tasks.
+> **Admin users** can view and manage all tasks, and can manage user roles. **Regular users** can only access their own tasks.
 
 ---
 
@@ -180,7 +182,7 @@ The frontend runs on `http://localhost:3000`.
 
 - User registration and login with password hashing (bcrypt)
 - JWT-based authentication stored in `localStorage`
-- Role-based access control (user vs admin)
+- Role-based access control (user vs admin) with admin-only routes
 - Protected dashboard that fetches and displays user tasks
 - Create and delete tasks via the UI
 - Success/error feedback messages
