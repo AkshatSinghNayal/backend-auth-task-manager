@@ -7,6 +7,9 @@ function Dashboard({ token, user, onLogout }) {
   const [newTask, setNewTask] = useState({ title: '', description: '', status: 'pending' });
   const [message, setMessage] = useState({ type: '', text: '' });
   const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [roleUpdatingId, setRoleUpdatingId] = useState('');
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -27,6 +30,32 @@ function Dashboard({ token, user, onLogout }) {
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
+
+  const fetchUsers = useCallback(async () => {
+    if (user?.role !== 'admin') return;
+
+    setUsersLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/auth/admin/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setUsers(data.users || []);
+      } else {
+        showMessage('error', data.message || 'Failed to load users');
+      }
+    } catch {
+      showMessage('error', 'Network error. Could not load users.');
+    } finally {
+      setUsersLoading(false);
+    }
+  }, [token, user?.role]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const showMessage = (type, text) => {
     setMessage({ type, text });
@@ -124,6 +153,35 @@ function Dashboard({ token, user, onLogout }) {
     return 'status-pending';
   };
 
+  const handleRoleChange = async (userId, role) => {
+    setRoleUpdatingId(userId);
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/admin/users/${userId}/role`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ role }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        showMessage('success', data.message || 'User role updated');
+        fetchUsers();
+      } else {
+        const errMsg = data.errors?.[0]?.msg || data.message || 'Failed to update role';
+        showMessage('error', errMsg);
+      }
+    } catch {
+      showMessage('error', 'Network error. Could not update role.');
+    } finally {
+      setRoleUpdatingId('');
+    }
+  };
+
   return (
     <div className="container">
       <div className="header">
@@ -205,6 +263,53 @@ function Dashboard({ token, user, onLogout }) {
             </li>
           ))}
         </ul>
+      )}
+
+      {user?.role === 'admin' && (
+        <div className="admin-panel">
+          <div className="admin-header">
+            <h3>User Management</h3>
+            <button className="btn-secondary" onClick={fetchUsers} disabled={usersLoading}>
+              {usersLoading ? 'Refreshing...' : 'Refresh Users'}
+            </button>
+          </div>
+
+          {users.length === 0 ? (
+            <p style={{ color: '#4b6555' }}>No users found.</p>
+          ) : (
+            <div className="users-list">
+              {users.map((u) => (
+                <div className="user-row" key={u._id || u.id}>
+                  <div className="user-info">
+                    <strong>{u.name}</strong>
+                    <span>{u.email}</span>
+                  </div>
+
+                  <div className="user-actions">
+                    <span className="role-chip">{u.role}</span>
+                    {u.role !== 'admin' ? (
+                      <button
+                        className="btn-secondary"
+                        disabled={roleUpdatingId === (u._id || u.id)}
+                        onClick={() => handleRoleChange(u._id || u.id, 'admin')}
+                      >
+                        Make Admin
+                      </button>
+                    ) : (
+                      <button
+                        className="btn-danger"
+                        disabled={roleUpdatingId === (u._id || u.id)}
+                        onClick={() => handleRoleChange(u._id || u.id, 'user')}
+                      >
+                        Make User
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

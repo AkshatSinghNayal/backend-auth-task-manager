@@ -202,3 +202,63 @@ h2 {
   text-align: center;
   color: #165a33;
 }
+
+.admin-panel {
+  margin-top: 24px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #cfe8d8;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(18, 90, 48, 0.06);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.user-row {
+  border: 1px solid #dcefe3;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-info span {
+  font-size: 13px;
+  color: #4b6555;
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.role-chip {
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #1e6b3a;
+  background: #d8f4e1;
+  border-radius: 999px;
+  padding: 4px 10px;
+}
