@@ -74,6 +74,17 @@ npm start
 
 The backend runs on `http://localhost:5000`.
 
+### 4. Promote first admin user
+
+Register a normal user first, then run:
+
+```bash
+cd backend
+npm run make-admin -- your-email@example.com
+```
+
+This promotes the user with that email to role `admin`.
+
 ---
 
 ## Backend API Reference
